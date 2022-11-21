@@ -1,5 +1,6 @@
 package com.example.firebasecrudapplication;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
@@ -12,7 +13,10 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class RegistrationActivity extends AppCompatActivity {
@@ -56,7 +60,23 @@ public class RegistrationActivity extends AppCompatActivity {
                 if (!pwd.equals(cnfPwd)){
                     Toast.makeText(RegistrationActivity.this , " Please check both password", Toast.LENGTH_SHORT).show();
                 }else if (TextUtils.isEmpty(userName) && TextUtils.isEmpty(pwd) && TextUtils.isEmpty(cnfPwd) ) {
-                    Toast.makeText(RegistrationActivity.this , " Please add your name ", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(RegistrationActivity.this , " Please add your credetials.. ", Toast.LENGTH_SHORT).show();
+                }else {
+                    mAuth.createUserWithEmailAndPassword(userName,pwd).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            if(task.isSuccessful()){
+                                loadingPB.setVisibility(View.GONE);
+                                Toast.makeText(RegistrationActivity.this, "User Registered" , Toast.LENGTH_SHORT).show();
+                                Intent i = new Intent(RegistrationActivity.this, LoginActivity.class);
+                                startActivity(i);
+                                finish();
+                            }else{
+                                loadingPB.setVisibility(View.GONE);
+                                Toast.makeText(RegistrationActivity.this, "Fail to register user .. " , Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
                 }
 
             }
